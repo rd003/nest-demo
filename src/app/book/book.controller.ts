@@ -3,23 +3,35 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
   Put,
+  Query,
+  Res,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { BookDto } from './book.model';
 import { BookService } from './book.service';
 import { Book } from './book.schema';
 import { ROLES } from '../utils/role-decorator';
+import { Public } from '../utils/public-decorator';
+import { BookQueryParams } from './book-query-params';
+import { Response } from 'express';
+import { BookResponse } from './book-response.model';
 
 @Controller('api/books')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
+  @Public()
+  @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  async getAll(): Promise<Book[]> {
-    return await this.bookService.getAll();
+  async getAll(@Query() query: BookQueryParams): Promise<BookResponse> {
+    const bookResult = await this.bookService.getAll(query);
+    return bookResult;
   }
 
   @Get(':id')
@@ -31,7 +43,7 @@ export class BookController {
 
   @ROLES('editor,developer')
   @Post()
-  async createBook(@Body() book: BookDto): Promise<Book> {
+  async createBook(@Body() book: BookDto) {
     const createdBook = await this.bookService.createdBook(book);
     return createdBook;
   }
