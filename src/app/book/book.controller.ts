@@ -11,6 +11,7 @@ import {
 import { BookDto } from './book.model';
 import { BookService } from './book.service';
 import { Book } from './book.schema';
+import { ROLES } from '../utils/role-decorator';
 
 @Controller('api/books')
 export class BookController {
@@ -28,12 +29,14 @@ export class BookController {
     return book;
   }
 
+  @ROLES('editor,developer')
   @Post()
   async createBook(@Body() book: BookDto): Promise<Book> {
     const createdBook = await this.bookService.createdBook(book);
     return createdBook;
   }
 
+  @ROLES('developer,editor')
   @Put(':id')
   async updateBook(
     @Param('id') id: string,
@@ -44,6 +47,7 @@ export class BookController {
     return await this.bookService.updateBook(book);
   }
 
+  @ROLES('developer,editor')
   @Delete(':id')
   async deleteBook(@Param('id') id: string): Promise<Book> {
     const existingBook = await this.bookService.findById(id);

@@ -15,14 +15,12 @@ export class AuthService {
   ) {}
 
   async login(username: string, password: string) {
-    console.log({ username, password });
     const user = await this.userService.findOne(username);
     if (user === null) throw new NotFoundException();
-    // user.password is hash here
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new UnauthorizedException();
 
-    const payload = { sub: user._id, user: user.username };
+    const payload = { sub: user._id, user: user.username, roles: user.roles };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
