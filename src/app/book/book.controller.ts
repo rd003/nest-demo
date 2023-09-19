@@ -26,7 +26,6 @@ import { BookResponse } from './book-response.model';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  @Public()
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
   async getAll(@Query() query: BookQueryParams): Promise<BookResponse> {
